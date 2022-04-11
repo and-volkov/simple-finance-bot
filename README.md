@@ -19,7 +19,6 @@
    8. Вывести отчет в виде графика (google таблица)
 ### 4. Стек технологий
    1. Python
-   2. SqlAlchemy
-   3. iogram
-   4. Google sheets
+   2. SQLight
+   3. aiogram
    5. Docker 
