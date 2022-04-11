@@ -132,5 +132,9 @@ dmypy.json
 .idea
 /idea
 
+# Tokens file
 setenv.sh
 .setenv.sh.swp
+
+# ignore database
+*.db
