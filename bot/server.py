@@ -1,13 +1,14 @@
 import os
 import logging
+from typing import AnyStr
 
 from aiogram import Bot, Dispatcher, executor, types
 
 from middelwares import AccessMiddleware
 
 
-BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')
-ACCESS_ID = os.getenv('MY_TELEGRAM_ID')
+BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
+ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
