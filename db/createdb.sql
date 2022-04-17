@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions(
 	id INTEGER primary key,
 	categorie_name VARCHAR(255) REFERENCES categories(categorie),
+	subcategorie_name VARCHAR(255) REFERENCES subcategories(subcategorie_name),
 	time DATETIME,
 	amount INTEGER,
 	description TEXT
