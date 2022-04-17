@@ -5,6 +5,7 @@ from typing import AnyStr
 from aiogram import Bot, Dispatcher, executor, types
 
 from middelwares import AccessMiddleware
+from keyboards import MainMenu
 
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
@@ -19,12 +20,13 @@ dp = Dispatcher(bot)
 dp.middleware.setup(AccessMiddleware(ACCESS_ID))
 
 
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
-    await message.reply("Hi. It's time to document your expenses!")
+    x = MainMenu()
+    await message.reply('Ok', reply_markup=x.keyboard())
 
 
 if __name__ == '__main__':
