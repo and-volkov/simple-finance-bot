@@ -15,7 +15,7 @@ class Keyboard:
     def create_buttons(self) -> List[KeyboardButton]:
         buttons_list = []
         for button_name in self.button_names:
-            buttons_list.append(KeyboardButton(text=button_name))
+            buttons_list.append(KeyboardButton(text='/' + button_name))
         return buttons_list
 
     def create_keyboard(self) -> ReplyKeyboardMarkup:
@@ -29,7 +29,7 @@ class Keyboard:
 
 class MainMenu(Keyboard):
     def __init__(self):
-        button_names = ['Expense', 'Income', 'Amount', 'Stats']
+        button_names = ['Expense', 'Income', 'Help', 'Stats']
         super().__init__(button_names)
 
 
