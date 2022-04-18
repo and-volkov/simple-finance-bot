@@ -10,8 +10,8 @@ cursor = connection.cursor()
 
 def get_columns(table_name: str, name) -> List[str]:
     cursor.execute(f'SELECT {name} FROM {table_name}')
-    cols = cursor.fetchall()
-    return cols
+    columns = cursor.fetchall()
+    return [col[0] for col in columns]
 
 
 def _init_db():
