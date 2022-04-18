@@ -8,8 +8,16 @@ connection = sqlite3.connect(os.path.join('db', 'finances.db'))
 cursor = connection.cursor()
 
 
-def get_columns(table_name: str, name) -> List[str]:
-    cursor.execute(f'SELECT {name} FROM {table_name}')
+def get_categorie_names(table_name: str, cat_name) -> List[str]:
+    cursor.execute(f'SELECT {cat_name} FROM {table_name}')
+    columns = cursor.fetchall()
+    return [col[0] for col in columns]
+
+
+def get_subcat_names(table_name: str, cat_name: str) -> List[str]:
+    cursor.execute(f'SELECT subcategorie_name '
+                   f'FROM {table_name} '
+                   f'WHERE categorie_name = "{cat_name}"')
     columns = cursor.fetchall()
     return [col[0] for col in columns]
 
