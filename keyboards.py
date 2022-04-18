@@ -2,6 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from typing import List
 
+from db_queries import get_categorie_names, get_subcat_names
+
 
 class Keyboard:
     def __init__(self, button_names: List[str]):
@@ -31,19 +33,49 @@ class MainMenu(Keyboard):
         super().__init__(button_names)
 
 
-class ExpenseCategories(Keyboard):
+class Categories(Keyboard):
     def __init__(self):
-        button_names = ['Home', 'Groceries', 'Restaurants',
-                        'Sport', 'Clothes', 'Travel']
-        super().__init__(self, button_names)
+        button_names = get_categorie_names('categories', 'categorie')
+        super().__init__(button_names)
 
 
 class HomeSubcategories(Keyboard):
     def __init__(self):
-        button_names = ['Water', 'Electricity', 'Internet', 'Chemicals',
-                        'Medicine', 'Subscriptions', 'Other-Home']
-        super().__init__(self, button_names)
+        button_names = get_subcat_names('subcategories',
+                                        'Home')
+        super().__init__(button_names)
 
 
 class GroceriesSubcategories(Keyboard):
-    button_names = ['Meat',]
+    def __init__(self):
+        button_names = get_subcat_names('subcategories',
+                                        'Groceries')
+        super().__init__(button_names)
+
+
+class RestaurantsSubcategories(Keyboard):
+    def __init__(self):
+        button_names = get_subcat_names('subcategories',
+                                        'Restaurants')
+        super().__init__(button_names)
+
+
+class SportSubcategories(Keyboard):
+    def __init__(self):
+        button_names = get_subcat_names('subcategories',
+                                        'Sport')
+        super().__init__(button_names)
+
+
+class ClothesSubcategories(Keyboard):
+    def __init__(self):
+        button_names = get_subcat_names('subcategories',
+                                        'Clothes')
+        super().__init__(button_names)
+
+
+class TravelSubcategories(Keyboard):
+    def __init__(self):
+        button_names = get_subcat_names('subcategories',
+                                        'Travel')
+        super().__init__(button_names)
