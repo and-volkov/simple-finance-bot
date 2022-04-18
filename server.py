@@ -5,7 +5,10 @@ from typing import AnyStr
 from aiogram import Bot, Dispatcher, executor, types
 
 from middelwares import AccessMiddleware
-from keyboards import MainMenu
+from keyboards import (MainMenu, Categories, HomeSubcategories,
+                       GroceriesSubcategories, RestaurantsSubcategories,
+                       SportSubcategories, ClothesSubcategories,
+                       TravelSubcategories)
 
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
@@ -21,12 +24,33 @@ dp.middleware.setup(AccessMiddleware(ACCESS_ID))
 
 
 @dp.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
-    """
-    This handler will be called when user sends `/start` or `/help` command
-    """
-    x = MainMenu()
-    await message.reply('Ok', reply_markup=x.keyboard())
+async def main_menu(message: types.Message):
+    """Open Main Menu"""
+    keyboard = MainMenu().create_keyboard()
+    await message.reply('Choose option', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=['Expense'])
+async def choose_category(message: types.Message):
+    """Open Category menu"""
+    keyboard = Categories().create_keyboard()
+    await message.reply('Choose Category', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=['Clothes', 'Groceries', 'Home',
+                              'Restaurants', 'Sport', 'Travel'])
+async def choose_subcategory(message: types.Message):
+    """Open Subcategory menu"""
+    sub_cat_dict = {
+        '/Home': HomeSubcategories(),
+        '/Groceries': GroceriesSubcategories(),
+        '/Restaurants': RestaurantsSubcategories(),
+        '/Sport': SportSubcategories(),
+        '/Clothes': ClothesSubcategories(),
+        '/Travel': TravelSubcategories()
+    }
+    keyboard = sub_cat_dict[message.get_command()].create_keyboard()
+    await message.reply('Choose Subcategory', reply_markup=keyboard)
 
 
 if __name__ == '__main__':
