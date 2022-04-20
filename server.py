@@ -8,8 +8,7 @@ from middelwares import AccessMiddleware
 from keyboards import (MainMenu, Categories, HomeSubcategories,
                        GroceriesSubcategories, RestaurantsSubcategories,
                        SportSubcategories, ClothesSubcategories,
-                       TravelSubcategories)
-
+                       TravelSubcategories, IncomeCategories)
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
 ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
@@ -21,6 +20,19 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_API_TOKEN)
 dp = Dispatcher(bot)
 dp.middleware.setup(AccessMiddleware(ACCESS_ID))
+
+
+@dp.message_handler(commands=['help'])
+async def help_message(message: types.Message):
+    """Show Help message"""
+    keyboard = MainMenu().create_keyboard()
+    await message.reply(
+        'Bot for finance monitoring\n\n'
+        'You can add expenses by categories\n'
+        'Add income, delete expense/income\n'
+        'Look at your stats for day, week, month, all time',
+        reply_markup=keyboard
+    )
 
 
 @dp.message_handler(commands=['start'])
@@ -37,8 +49,12 @@ async def choose_category(message: types.Message):
     await message.reply('Choose Category', reply_markup=keyboard)
 
 
-@dp.message_handler(commands=['Clothes', 'Groceries', 'Home',
-                              'Restaurants', 'Sport', 'Travel'])
+@dp.message_handler(
+    commands=[
+        'Clothes', 'Groceries', 'Home',
+        'Restaurants', 'Sport', 'Travel'
+    ]
+)
 async def choose_subcategory(message: types.Message):
     """Open Subcategory menu"""
     sub_cat_dict = {
@@ -53,6 +69,11 @@ async def choose_subcategory(message: types.Message):
     await message.reply('Choose Subcategory', reply_markup=keyboard)
 
 
+@dp.message_handler(commands=['income'])
+async def income_categories(message: types.Message):
+    keyboard = IncomeCategories().create_keyboard()
+    await message.reply('Choose Category', reply_markup=keyboard)
+
+
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-
