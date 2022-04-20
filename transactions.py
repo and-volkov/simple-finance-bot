@@ -52,5 +52,3 @@ def split_message(message: str):
 def parse_message(message: str):
     message_list = message.split(',')
     return [val.strip() for val in message_list]
-
-print()
