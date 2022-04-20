@@ -4,6 +4,7 @@ from typing import AnyStr
 
 from aiogram import Bot, Dispatcher, executor, types
 
+import db_queries
 from middelwares import AccessMiddleware
 
 import income, transactions
@@ -45,7 +46,7 @@ async def main_menu(message: types.Message):
 
 
 @dp.message_handler(commands=['Expense'])
-async def choose_category(message: types.Message):
+async def espense_menu(message: types.Message):
     """Open Category menu"""
     keyboard = Categories().create_keyboard()
     await message.reply('Choose Category', reply_markup=keyboard)
@@ -57,7 +58,7 @@ async def choose_category(message: types.Message):
         'Restaurants', 'Sport', 'Travel'
     ]
 )
-async def choose_subcategory(message: types.Message):
+async def choose_category(message: types.Message):
     """Open Subcategory menu, after add new transaction"""
     sub_cat_dict = {
         '/Home': HomeSubcategories(),
@@ -69,32 +70,30 @@ async def choose_subcategory(message: types.Message):
     }
     category = message.get_command()
     keyboard = sub_cat_dict[category].create_keyboard()
-    reply = 'Choose Subcategory. Write amount and description\n\n'
-    await message.reply(reply, reply_markup=keyboard)
+    await message.reply('Choose Subcategory.', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=db_queries.select_all_subcategories())
+async def choose_subcategory(sub_name: types.Message):
+    """Create new db transaction"""
+    subcategory_name = sub_name.get_command().split('/')[1]
+    category_name = db_queries.get_categorie_by_subcategorie(
+        subcategory_name
+    )
+    await sub_name.answer('Enter value, description')
 
     @dp.message_handler()
-    async def get_expense_category(subcategory: types.Message):
-        """Get subcategory from user choice"""
-        # print(subcategory.text[1:])
-        subcategory_name = subcategory.text[1:]
-        transaction_format = 'Message format: {amount}, {description}'
-        await subcategory.answer(transaction_format)
-
-        @dp.message_handler()
-        async def add_new_expense(amount_description: types.Message):
-            """Create new db transaction"""
-            amount, description = transactions.parse_message(
-                amount_description
-            )
-            transaction = transactions.add_transaction(
-                category,
-                subcategory_name,
-                amount,
-                description
-            )
-            await amount_description.answer(
-                'Added transaction', reply=transaction
-            )
+    async def add_new_expense(amount_description: types.Message):
+        amount, description = transactions.parse_message(
+            amount_description.text
+        )
+        transaction = transactions.add_transaction(
+            category=category_name,
+            subcategory=subcategory_name,
+            amount=int(amount),
+            description=description
+        )
+        await sub_name.answer(str(transaction))
 
 
 @dp.message_handler(commands=['Income'])

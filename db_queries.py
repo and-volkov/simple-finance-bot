@@ -36,10 +36,44 @@ def get_subcat_names(table_name: str, cat_name: str) -> List[str]:
 
 def get_income_description(cat_name: str) -> str:
     table_name = 'income_categories'
-    cursor.execute(f'SELECT income_description_name '
-                   f'FROM {table_name} ' 
-                   f'WHERE income_categorie_name = "{cat_name}"')
+    cursor.execute(
+        f'SELECT income_description_name '
+        f'FROM {table_name} ' 
+        f'WHERE income_categorie_name = "{cat_name}"'
+    )
     return cursor.fetchall()[0][0]
+
+
+def get_categorie_by_subcategorie(sub_cat_name: str) -> str:
+    table_name = 'subcategories'
+    cursor.execute(
+        f'SELECT categorie_name '
+        f'FROM {table_name} '
+        f'WHERE subcategorie_name = "{sub_cat_name}"'
+    )
+    return cursor.fetchall()[0][0]
+
+
+def select_all_categories():
+    table_name = 'categories'
+    cursor.execute(
+        f'SELECT DISTINCT categorie '
+        f'FROM {table_name} '
+    )
+    categories = cursor.fetchall()
+    cat_list = [cat[0] for cat in categories]
+    return cat_list
+
+
+def select_all_subcategories():
+    table_name = 'subcategories'
+    cursor.execute(
+        f'SELECT DISTINCT subcategorie_name '
+        f'FROM {table_name} '
+    )
+    subcategories = cursor.fetchall()
+    sub_list = [sub_cat[0] for sub_cat in subcategories]
+    return sub_list
 
 
 def _init_db():
@@ -57,6 +91,5 @@ def check_db_exists():
     table_exists = cursor.fetchall()
     if not table_exists:
         _init_db()
-
 
 check_db_exists()
