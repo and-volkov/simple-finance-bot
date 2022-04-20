@@ -26,15 +26,15 @@ CREATE TABLE income(
 	id INTEGER PRIMARY KEY,
 	amount INTEGER,
 	time DATETIME,
-	source VARCHAR(255),
-    income_categorie VARCHAR(255)
+	income_categorie VARCHAR(255),
+	income_description VARCHAR(255)
 	);
 
 DROP TABLE IF EXISTS income_categories;
 CREATE TABLE income_categories(
     id INTEGER PRIMARY KEY,
     income_categorie_name VARCHAR(255) REFERENCES  income(income_categorie),
-    income_description TEXT
+    income_description_name VARCHAR (255) REFERENCES income(income_description)
 );
 
 INSERT INTO categories(categorie, categorie_desc)
@@ -92,7 +92,7 @@ INSERT INTO subcategories(subcategorie_name, categorie_name, subcategorie_desc)
     ("Transfer", "Travel", "Переезд"),
     ("Other-Travel", "Travel", "Другое");
 
-INSERT INTO income_categories(income_categorie_name, income_description)
+INSERT INTO income_categories(income_categorie_name, income_description_name)
     VALUES
     ("Salary", "Зарплата"),
     ("Bonus", "Премия"),
