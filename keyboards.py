@@ -29,53 +29,86 @@ class Keyboard:
 
 class MainMenu(Keyboard):
     def __init__(self):
-        button_names = ['Expense', 'Income', 'Help', 'Stats']
+        button_names = [
+            'Expense',
+            'Income',
+            'Help',
+            'Stats',
+            'Delete Expense',
+            'Delete Income',
+            ]
         super().__init__(button_names)
 
 
+#  Expense keyboards
 class Categories(Keyboard):
     def __init__(self):
-        button_names = get_categorie_names('categories', 'categorie')
+        button_names = get_categorie_names(
+            'categories',
+            'categorie'
+        )
         super().__init__(button_names)
 
 
 class HomeSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Home')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Home'
+        )
         super().__init__(button_names)
 
 
 class GroceriesSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Groceries')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Groceries'
+        )
         super().__init__(button_names)
 
 
 class RestaurantsSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Restaurants')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Restaurants'
+        )
         super().__init__(button_names)
 
 
 class SportSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Sport')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Sport'
+        )
         super().__init__(button_names)
 
 
 class ClothesSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Clothes')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Clothes'
+        )
         super().__init__(button_names)
 
 
 class TravelSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names('subcategories',
-                                        'Travel')
+        button_names = get_subcat_names(
+            'subcategories',
+            'Travel'
+        )
+        super().__init__(button_names)
+
+
+#  Income keyboards
+class IncomeCategories(Keyboard):
+    def __init__(self):
+        button_names = get_categorie_names(
+            'income_categories',
+            'income_categorie_name'
+        )
         super().__init__(button_names)
