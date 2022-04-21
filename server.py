@@ -10,7 +10,6 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 from aiogram.dispatcher import FSMContext
 
-import db_queries
 from middelwares import AccessMiddleware
 
 from income import add_income
@@ -28,8 +27,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(AccessMiddleware(ACCESS_ID))
-
-# form_router = Router()
 
 
 class IncomeForm(StatesGroup):
@@ -103,14 +100,19 @@ async def process_income_categorie(message: types.Message, state: FSMContext):
 
 
 #  Check amount not digit
-@dp.message_handler(lambda message: not message.text.isdigit(),
-                    state=IncomeForm.amount)
+@dp.message_handler(
+    lambda message: not message.text.isdigit(),
+    state=IncomeForm.amount
+)
 async def invalid_income_amount(message: types.Message):
     await message.reply('Amount gotta be a number\nEnter Income amount')
 
 
 #  Check amount is digit
-@dp.message_handler(lambda message: message.text.isdigit(), state=IncomeForm.amount)
+@dp.message_handler(
+    lambda message: message.text.isdigit(),
+    state=IncomeForm.amount
+)
 async def process_income_amount(message: types.Message, state: FSMContext):
     """Getting amount of income if message is correct (digit)"""
     async with state.proxy() as data:
@@ -154,7 +156,8 @@ async def process_expense_categorie(message: types.Message, state: FSMContext):
     await ExpenseForm.next()
     await message.reply(
         'Choose subcategory',
-        reply_markup=expenses_keyboards_dict[categorie])
+        reply_markup=expenses_keyboards_dict[categorie]
+    )
 
 
 @dp.message_handler(state=ExpenseForm.subcategorie)
@@ -170,8 +173,10 @@ async def process_expense_subcategorie(
 
 
 #  Check amount not digit
-@dp.message_handler(lambda message: not message.text.isdigit(),
-                    state=ExpenseForm.amount)
+@dp.message_handler(
+    lambda message: not message.text.isdigit(),
+    state=ExpenseForm.amount
+)
 async def invalid_expense_amount(message: types.Message):
     await message.reply('Amount gotta be a number\nEnter Expense amount')
 
