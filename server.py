@@ -13,7 +13,8 @@ from aiogram.dispatcher import FSMContext
 import db_queries
 from middelwares import AccessMiddleware
 
-import income, expenses
+from income import add_income
+from expenses import add_expense
 from keyboards import (MainMenu, ExpensesCategories,
                        IncomeCategories, expenses_keyboards_dict)
 
@@ -124,6 +125,10 @@ async def process_income_amount(message: types.Message, state: FSMContext):
             ),
             parse_mode=ParseMode.MARKDOWN
         )
+    add_income(
+        amount=data['amount'],
+        categorie=data['categorie']
+    )
 
     await state.finish()
 
@@ -190,6 +195,11 @@ async def process_expense_amount(message: types.Message, state: FSMContext):
             ),
             parse_mode=ParseMode.MARKDOWN
         )
+    add_expense(
+        category=data['categorie'],
+        subcategory=data['subcategorie'],
+        amount=data['amount']
+    )
 
     await state.finish()
 
