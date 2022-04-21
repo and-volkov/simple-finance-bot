@@ -133,6 +133,10 @@ async def process_income_amount(message: types.Message, state: FSMContext):
     )
 
     await state.finish()
+    await message.reply(
+        'Add more, or write "cancel"',
+        MainMenu().create_keyboard()
+    )
 
 
 #  Set state for Expense Command
@@ -207,6 +211,10 @@ async def process_expense_amount(message: types.Message, state: FSMContext):
     )
 
     await state.finish()
+    await message.reply(
+        'Add more, or write "cancel"',
+        reply_markup=MainMenu().create_keyboard()
+    )
 
 
 if __name__ == '__main__':
