@@ -2,8 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from typing import List
 
-from db_queries import get_categories
-
+from db_queries import get_categories, get_subcategories
 
 
 class Keyboard:
@@ -42,7 +41,7 @@ class MainMenu(Keyboard):
 
 
 #  Expense keyboards
-class Categories(Keyboard):
+class ExpensesCategories(Keyboard):
     def __init__(self):
         button_names = get_categories(
             'expenses_categories',
@@ -52,8 +51,8 @@ class Categories(Keyboard):
 
 class HomeSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Home'
         )
         super().__init__(button_names)
@@ -61,8 +60,8 @@ class HomeSubcategories(Keyboard):
 
 class GroceriesSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Groceries'
         )
         super().__init__(button_names)
@@ -70,8 +69,8 @@ class GroceriesSubcategories(Keyboard):
 
 class RestaurantsSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Restaurants'
         )
         super().__init__(button_names)
@@ -79,8 +78,8 @@ class RestaurantsSubcategories(Keyboard):
 
 class SportSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Sport'
         )
         super().__init__(button_names)
@@ -88,8 +87,8 @@ class SportSubcategories(Keyboard):
 
 class ClothesSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Clothes'
         )
         super().__init__(button_names)
@@ -97,8 +96,8 @@ class ClothesSubcategories(Keyboard):
 
 class TravelSubcategories(Keyboard):
     def __init__(self):
-        button_names = get_subcat_names(
-            'subcategories',
+        button_names = get_subcategories(
+            'expenses_subcategories',
             'Travel'
         )
         super().__init__(button_names)
@@ -111,3 +110,13 @@ class IncomeCategories(Keyboard):
             'income_categories',
         )
         super().__init__(button_names)
+
+
+expenses_keyboards_dict = {
+    'Home': HomeSubcategories().create_keyboard(),
+    'Groceries': GroceriesSubcategories().create_keyboard(),
+    'Restaurants': RestaurantsSubcategories().create_keyboard(),
+    'Sport': SportSubcategories().create_keyboard(),
+    'Clothes': ClothesSubcategories().create_keyboard(),
+    'Travel': TravelSubcategories().create_keyboard()
+}
