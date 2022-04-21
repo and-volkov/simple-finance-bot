@@ -3,11 +3,17 @@ import logging
 from typing import AnyStr
 
 from aiogram import Bot, Dispatcher, executor, types
+import aiogram.utils.markdown as md
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher.filters import Text
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.types import ParseMode
+from aiogram.dispatcher import FSMContext
 
 import db_queries
 from middelwares import AccessMiddleware
 
-import income, transactions
+import income, expenses
 from keyboards import (MainMenu, Categories, HomeSubcategories,
                        GroceriesSubcategories, RestaurantsSubcategories,
                        SportSubcategories, ClothesSubcategories,
@@ -21,8 +27,15 @@ logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
 bot = Bot(token=BOT_API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(AccessMiddleware(ACCESS_ID))
+
+# form_router = Router()
+
+
+class IncomeForm(StatesGroup):
+    categorie = State()
+    amount = State()
 
 
 @dp.message_handler(commands=['help'])
@@ -38,6 +51,23 @@ async def help_message(message: types.Message):
     )
 
 
+@dp.message_handler(state='*', commands='cancel')
+@dp.message_handler(Text(equals='cancel', ignore_case=True), state='*')
+async def cancel_handler(message: types.Message, state: FSMContext):
+    """
+    Allow user to cancel any action
+    """
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+
+    logging.info('Cancelling state %r', current_state)
+    # Cancel state and inform user about it
+    await state.finish()
+    # And remove keyboard (just in case)
+    await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
+
+
 @dp.message_handler(commands=['start'])
 async def main_menu(message: types.Message):
     """Open Main Menu"""
@@ -45,77 +75,52 @@ async def main_menu(message: types.Message):
     await message.reply('Choose option', reply_markup=keyboard)
 
 
-@dp.message_handler(commands=['Expense'])
-async def espense_menu(message: types.Message):
-    """Open Category menu"""
-    keyboard = Categories().create_keyboard()
-    await message.reply('Choose Category', reply_markup=keyboard)
-
-
-@dp.message_handler(
-    commands=[
-        'Clothes', 'Groceries', 'Home',
-        'Restaurants', 'Sport', 'Travel'
-    ]
-)
-async def choose_category(message: types.Message):
-    """Open Subcategory menu, after add new transaction"""
-    sub_cat_dict = {
-        '/Home': HomeSubcategories(),
-        '/Groceries': GroceriesSubcategories(),
-        '/Restaurants': RestaurantsSubcategories(),
-        '/Sport': SportSubcategories(),
-        '/Clothes': ClothesSubcategories(),
-        '/Travel': TravelSubcategories()
-    }
-    category = message.get_command()
-    keyboard = sub_cat_dict[category].create_keyboard()
-    await message.reply('Choose Subcategory.', reply_markup=keyboard)
-
-
-@dp.message_handler(commands=db_queries.select_all_subcategories())
-async def choose_subcategory(sub_name: types.Message):
-    """Create new db transaction"""
-    subcategory_name = sub_name.get_command().split('/')[1]
-    category_name = db_queries.get_categorie_by_subcategorie(
-        subcategory_name
+#  Set state for Income Command
+@dp.message_handler(commands='Income')
+async def income(message: types.Message):
+    await IncomeForm.categorie.set()
+    await message.reply(
+        'Choose subcategory',
+        reply_markup=IncomeCategories().create_keyboard()
     )
-    await sub_name.answer('Enter value, description')
 
-    @dp.message_handler()
-    async def add_new_expense(amount_description: types.Message):
-        amount, description = transactions.parse_message(
-            amount_description.text
+
+#  Getting income categorie
+@dp.message_handler(state=IncomeForm.categorie)
+async def process_income_categorie(message: types.Message, state: FSMContext):
+    """Process income categorie"""
+    async with state.proxy() as data:
+        data['categorie'] = message.text.split('/')[1]
+
+    await IncomeForm.next()
+    await message.reply('Enter income amount')
+
+
+#  Check amount not digit
+@dp.message_handler(lambda message: not message.text.isdigit(),
+                    state=IncomeForm.amount)
+async def invalid_income_amount(message: types.Message):
+    await message.reply('Amount gotta be a number\nEnter Income amount')
+
+
+#  Check amount is digit
+@dp.message_handler(lambda message: message.text.isdigit(), state=IncomeForm.amount)
+async def process_income_amount(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['amount'] = int(message.text)
+
+        await bot.send_message(
+            message.chat.id,
+            md.text(
+                md.text('Category: ', md.bold(data['categorie'])),
+                md.text('Amount: ', md.bold(data['amount'])),
+                sep='\n'
+            ),
+            parse_mode=ParseMode.MARKDOWN
         )
-        transaction = transactions.add_transaction(
-            category=category_name,
-            subcategory=subcategory_name,
-            amount=int(amount),
-            description=description
-        )
-        await sub_name.answer(str(transaction))
 
+    await state.finish()
 
-@dp.message_handler(commands=['Income'])
-async def choose_income_category(message: types.Message):
-    """Open Income Category menu"""
-    keyboard = IncomeCategories().create_keyboard()
-    await message.reply('Choose Income Category', reply_markup=keyboard)
-
-
-@dp.message_handler(commands=["Salary", "Bonus", "Freelance", "Other"])
-async def income_categories(message: types.Message):
-    income_categorie = message.get_command().split('/')[1]
-    await message.answer('Enter income value')
-
-    @dp.message_handler()
-    async def add_new_income(income_value: types.Message):
-        amount = int(income_value.text)
-        transaction = income.add_income(
-            amount=amount,
-            income_categorie=income_categorie,
-        )
-        await income_value.answer(str(transaction))
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
