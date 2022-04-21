@@ -14,10 +14,8 @@ import db_queries
 from middelwares import AccessMiddleware
 
 import income, expenses
-from keyboards import (MainMenu, Categories, HomeSubcategories,
-                       GroceriesSubcategories, RestaurantsSubcategories,
-                       SportSubcategories, ClothesSubcategories,
-                       TravelSubcategories, IncomeCategories)
+from keyboards import (MainMenu, ExpensesCategories,
+                       IncomeCategories, expenses_keyboards_dict)
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
 ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
@@ -35,6 +33,12 @@ dp.middleware.setup(AccessMiddleware(ACCESS_ID))
 
 class IncomeForm(StatesGroup):
     categorie = State()
+    amount = State()
+
+
+class ExpenseForm(StatesGroup):
+    categorie = State()
+    subcategorie = State()
     amount = State()
 
 
@@ -78,6 +82,7 @@ async def main_menu(message: types.Message):
 #  Set state for Income Command
 @dp.message_handler(commands='Income')
 async def income(message: types.Message):
+    """Showing income categories menu"""
     await IncomeForm.categorie.set()
     await message.reply(
         'Choose subcategory',
@@ -106,6 +111,7 @@ async def invalid_income_amount(message: types.Message):
 #  Check amount is digit
 @dp.message_handler(lambda message: message.text.isdigit(), state=IncomeForm.amount)
 async def process_income_amount(message: types.Message, state: FSMContext):
+    """Getting amount of income if message is correct (digit)"""
     async with state.proxy() as data:
         data['amount'] = int(message.text)
 
@@ -113,6 +119,72 @@ async def process_income_amount(message: types.Message, state: FSMContext):
             message.chat.id,
             md.text(
                 md.text('Category: ', md.bold(data['categorie'])),
+                md.text('Amount: ', md.bold(data['amount'])),
+                sep='\n'
+            ),
+            parse_mode=ParseMode.MARKDOWN
+        )
+
+    await state.finish()
+
+
+#  Set state for Expense Command
+@dp.message_handler(commands='Expense')
+async def income(message: types.Message):
+    """Showing expenses categories menu"""
+    await ExpenseForm.categorie.set()
+    await message.reply(
+        'Category subcategory',
+        reply_markup=ExpensesCategories().create_keyboard()
+    )
+
+
+@dp.message_handler(state=ExpenseForm.categorie)
+async def process_expense_categorie(message: types.Message, state: FSMContext):
+    """Process expenses categorie"""
+    categorie = message.text.split('/')[1]
+    async with state.proxy() as data:
+        data['categorie'] = categorie
+
+    await ExpenseForm.next()
+    await message.reply(
+        'Choose subcategory',
+        reply_markup=expenses_keyboards_dict[categorie])
+
+
+@dp.message_handler(state=ExpenseForm.subcategorie)
+async def process_expense_subcategorie(
+        message: types.Message, state: FSMContext
+):
+    subcategorie = message.text.split('/')[1]
+    async with state.proxy() as data:
+        data['subcategorie'] = subcategorie
+
+    await ExpenseForm.next()
+    await message.reply('Enter amount of expense')
+
+
+#  Check amount not digit
+@dp.message_handler(lambda message: not message.text.isdigit(),
+                    state=ExpenseForm.amount)
+async def invalid_expense_amount(message: types.Message):
+    await message.reply('Amount gotta be a number\nEnter Expense amount')
+
+
+#  Check amount is digit
+@dp.message_handler(
+    lambda message: message.text.isdigit(),
+    state=ExpenseForm.amount
+)
+async def process_expense_amount(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['amount'] = int(message.text)
+
+        await bot.send_message(
+            message.chat.id,
+            md.text(
+                md.text('Category: ', md.bold(data['categorie'])),
+                md.text('Subcategory', md.bold(data['subcategorie'])),
                 md.text('Amount: ', md.bold(data['amount'])),
                 sep='\n'
             ),
