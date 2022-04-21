@@ -8,33 +8,33 @@ class Income(NamedTuple):
     id: int
     amount: int
     time: datetime.datetime
-    income_categorie: str
-    income_description: str
+    categorie: str
+    description: str
 
     def __str__(self):
         return (
             f'Добавлено {self.amount}  рублей\n'
             f'Время: {self.time}\n'
-            f'В категорию {self.income_categorie}:'
-            f'{self.income_description}'
+            f'В категорию {self.categorie}:'
+            f'{self.description}'
         )
 
 
-def add_income(amount: int, income_categorie: str):
+def add_income(amount: int, categorie: str):
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    description = db_queries.get_income_description(income_categorie)
-    inserted_row_id = db_queries.insert(
+    description = db_queries.get_income_description(categorie)
+    db_queries.insert(
         'income', {
             'amount': amount,
             'time': time,
-            'income_categorie': income_categorie,
-            'income_description': description
-        }
-    )
+            'categorie': categorie,
+            'description': description
+            }
+        )
     return Income(
         id=None,
         amount=int(amount),
         time=time,
-        income_categorie=income_categorie,
-        income_description=description
+        categorie=categorie,
+        description=description
     )

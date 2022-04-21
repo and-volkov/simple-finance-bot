@@ -4,7 +4,7 @@ from typing import NamedTuple
 import db_queries
 
 
-class Transaction(NamedTuple):
+class Expense(NamedTuple):
     id: int
     category: str
     subcategory: str
@@ -20,22 +20,23 @@ class Transaction(NamedTuple):
             )
 
 
-def add_transaction(
-        category: str,
-        subcategory: str,
-        amount: str,
-        description: str) -> Transaction:
+def add_expense(
+    category: str,
+    subcategory: str,
+    amount: str,
+) -> Expense:
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    inserted_row_id = db_queries.insert(
-        'transactions', {
-            'categorie_name': category,
-            'subcategorie_name': subcategory,
+    description = db_queries.get_expenses_description(subcategory)
+    db_queries.insert(
+        'expenses', {
+            'categorie': category,
+            'subcategorie': subcategory,
             'time': time,
             'amount': int(amount),
             'description': description
-        }
-    )
-    return Transaction(
+            }
+        )
+    return Expense(
         id=None,
         category=category,
         subcategory=subcategory,
