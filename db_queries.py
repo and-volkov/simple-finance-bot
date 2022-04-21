@@ -20,60 +20,40 @@ def insert(table: str, column_values: Dict):
     connection.commit()
 
 
-def get_categorie_names(table_name: str, cat_name) -> List[str]:
-    cursor.execute(f'SELECT {cat_name} FROM {table_name}')
+def get_categories(table_name: str) -> List[str]:
+    cursor.execute(
+        f'SELECT categorie FROM {table_name}')
     columns = cursor.fetchall()
     return [col[0] for col in columns]
 
 
-def get_subcat_names(table_name: str, cat_name: str) -> List[str]:
-    cursor.execute(f'SELECT subcategorie_name '
-                   f'FROM {table_name} '
-                   f'WHERE categorie_name = "{cat_name}"')
+def get_subcategories(table_name: str, categorie_name) -> List[str]:
+    cursor.execute(
+        f'SELECT subcategorie '
+        f'FROM {table_name} '
+        f'WHERE categorie="{categorie_name}" '
+    )
     columns = cursor.fetchall()
     return [col[0] for col in columns]
 
 
-def get_income_description(cat_name: str) -> str:
-    table_name = 'income_categories'
+def get_expenses_description(subcategorie_name: str) -> str:
     cursor.execute(
-        f'SELECT income_description_name '
-        f'FROM {table_name} ' 
-        f'WHERE income_categorie_name = "{cat_name}"'
+        f'SELECT description '
+        f'FROM expenses_subcategories '
+        f'WHERE subcategorie="{subcategorie_name}" '
     )
     return cursor.fetchall()[0][0]
 
 
-def get_categorie_by_subcategorie(sub_cat_name: str) -> str:
-    table_name = 'subcategories'
+def get_income_description(categorie_name: str) -> str:
     cursor.execute(
-        f'SELECT categorie_name '
-        f'FROM {table_name} '
-        f'WHERE subcategorie_name = "{sub_cat_name}"'
+        f'SELECT description '
+        f'FROM income_categories '
+        f'WHERE categorie="{categorie_name}"'
     )
     return cursor.fetchall()[0][0]
 
-
-def select_all_categories():
-    table_name = 'categories'
-    cursor.execute(
-        f'SELECT DISTINCT categorie '
-        f'FROM {table_name} '
-    )
-    categories = cursor.fetchall()
-    cat_list = [cat[0] for cat in categories]
-    return cat_list
-
-
-def select_all_subcategories():
-    table_name = 'subcategories'
-    cursor.execute(
-        f'SELECT DISTINCT subcategorie_name '
-        f'FROM {table_name} '
-    )
-    subcategories = cursor.fetchall()
-    sub_list = [sub_cat[0] for sub_cat in subcategories]
-    return sub_list
 
 
 def _init_db():
@@ -87,9 +67,13 @@ def _init_db():
 def check_db_exists():
     """Проверяет, инициализирована ли БД, если нет — инициализирует"""
     cursor.execute('SELECT name FROM sqlite_master '
-                   'WHERE type=\'table\' AND name=\'categories\'')
+                   'WHERE type=\'table\' AND name=\'expenses\'')
     table_exists = cursor.fetchall()
     if not table_exists:
         _init_db()
 
+
 check_db_exists()
+
+
+print(get_expenses_description('Water'))
