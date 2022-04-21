@@ -55,7 +55,6 @@ def get_income_description(categorie_name: str) -> str:
     return cursor.fetchall()[0][0]
 
 
-
 def _init_db():
     """Инициализирует БД"""
     with open("db/createdb.sql", "r") as f:
@@ -74,6 +73,3 @@ def check_db_exists():
 
 
 check_db_exists()
-
-
-print(get_expenses_description('Water'))
