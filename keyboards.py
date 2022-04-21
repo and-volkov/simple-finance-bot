@@ -2,7 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from typing import List
 
-from db_queries import get_categorie_names, get_subcat_names
+from db_queries import get_categories
+
 
 
 class Keyboard:
@@ -43,9 +44,8 @@ class MainMenu(Keyboard):
 #  Expense keyboards
 class Categories(Keyboard):
     def __init__(self):
-        button_names = get_categorie_names(
-            'categories',
-            'categorie'
+        button_names = get_categories(
+            'expenses_categories',
         )
         super().__init__(button_names)
 
@@ -107,8 +107,7 @@ class TravelSubcategories(Keyboard):
 #  Income keyboards
 class IncomeCategories(Keyboard):
     def __init__(self):
-        button_names = get_categorie_names(
+        button_names = get_categories(
             'income_categories',
-            'income_categorie_name'
         )
         super().__init__(button_names)
