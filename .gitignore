@@ -138,3 +138,7 @@ setenv.sh
 
 # ignore database
 *.db
+
+# ignore graphs folder
+.graphs
+/graphs
