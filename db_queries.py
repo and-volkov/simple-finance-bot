@@ -103,6 +103,14 @@ def get_top_ten_stats():
     return cursor.fetchall()
 
 
+stats_dict = {
+    'Today': get_today_stats(),
+    'Week': get_weekly_stats(),
+    'Month': get_monthly_stats(),
+    'AllTime': get_top_ten_stats()
+}
+
+
 def _init_db():
     """Инициализирует БД"""
     with open("db/createdb.sql", "r") as f:
