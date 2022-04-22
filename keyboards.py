@@ -120,3 +120,24 @@ class IncomeCategories(Keyboard):
             'income_categories',
         )
         super().__init__(button_names)
+
+
+#  Stats keyboards
+class TextGraph(Keyboard):
+    def __init__(self):
+        button_names = [
+            'TextStats',
+            'GraphicStats'
+        ]
+        super().__init__(button_names)
+
+
+class TextStats(Keyboard):
+    def __init__(self):
+        button_names = [
+            'Today',
+            'Week',
+            'Month',
+            'AllTime'
+        ]
+        super().__init__(button_names)
