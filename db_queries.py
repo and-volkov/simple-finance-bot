@@ -57,19 +57,23 @@ def get_income_description(categorie_name: str) -> str:
 
 
 #  Stats queries
-def get_today_stats():
-    cursor.execute(
+def get_today_stats(action: str):
+    query = (
         f'SELECT SUM(amount) as summary, subcategorie, categorie '
         f'FROM expenses '
         f'WHERE date(time)=CURRENT_DATE '
         f'GROUP BY subcategorie '
         f'ORDER BY summary DESC;'
     )
-    return cursor.fetchall()
+    if action == 'handler':
+        cursor.execute(query)
+        return cursor.fetchall()
+    elif action == 'pandas':
+        return query
 
 
-def get_weekly_stats():
-    cursor.execute(
+def get_weekly_stats(action: str):
+    query = (
         f'SELECT SUM(amount) as summary, subcategorie, categorie '
         f'FROM expenses '
         f'WHERE date(current_timestamp)>=DATE("now", "weekday 0", "-7 days") '
@@ -77,11 +81,15 @@ def get_weekly_stats():
         f'ORDER BY summary DESC '
         f'LIMIT 10;'
     )
-    return cursor.fetchall()
+    if action == 'handler':
+        cursor.execute(query)
+        return cursor.fetchall()
+    elif action == 'pandas':
+        return query
 
 
-def get_monthly_stats():
-    cursor.execute(
+def get_monthly_stats(action: str):
+    query = (
         f'SELECT SUM(amount) as summary, subcategorie, categorie '
         f'FROM expenses '
         f'WHERE DATE(time, "start of month")=DATE("now", "start of month") '
@@ -89,25 +97,33 @@ def get_monthly_stats():
         f'ORDER BY summary DESC '
         f'LIMIT 10'
     )
-    return cursor.fetchall()
+    if action == 'handler':
+        cursor.execute(query)
+        return cursor.fetchall()
+    elif action == 'pandas':
+        return query
 
 
-def get_top_ten_stats():
-    cursor.execute(
+def get_top_ten_stats(action: str):
+    query = (
         f'SELECT SUM(amount) as summary, subcategorie, categorie '
         f'FROM expenses '
         f'GROUP BY subcategorie '
         f'ORDER BY summary DESC '
         f'LIMIT 10;'
     )
-    return cursor.fetchall()
+    if action == 'handler':
+        cursor.execute(query)
+        return cursor.fetchall()
+    elif action == 'pandas':
+        return query
 
 
 stats_dict = {
-    'Today': get_today_stats(),
-    'Week': get_weekly_stats(),
-    'Month': get_monthly_stats(),
-    'AllTime': get_top_ten_stats()
+    'Today': get_today_stats('handler'),
+    'Week': get_weekly_stats('handler'),
+    'Month': get_monthly_stats('handler'),
+    'AllTime': get_top_ten_stats('handler')
 }
 
 
