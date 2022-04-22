@@ -8,6 +8,7 @@ connection = sqlite3.connect(os.path.join('db', 'finances.db'))
 cursor = connection.cursor()
 
 
+#  Income, expense queries
 def insert(table: str, column_values: Dict):
     columns = ', '.join( column_values.keys() )
     values = [tuple(column_values.values())]
@@ -55,6 +56,53 @@ def get_income_description(categorie_name: str) -> str:
     return cursor.fetchall()[0][0]
 
 
+#  Stats queries
+def get_today_stats():
+    cursor.execute(
+        f'SELECT SUM(amount) as summary, subcategorie, categorie '
+        f'FROM expenses '
+        f'WHERE date(time)=CURRENT_DATE '
+        f'GROUP BY subcategorie '
+        f'ORDER BY summary DESC;'
+    )
+    return cursor.fetchall()
+
+
+def get_weekly_stats():
+    cursor.execute(
+        f'SELECT SUM(amount) as summary, subcategorie, categorie '
+        f'FROM expenses '
+        f'WHERE date(current_timestamp)>=DATE("now", "weekday 0", "-7 days") '
+        f'GROUP BY subcategorie '
+        f'ORDER BY summary DESC '
+        f'LIMIT 10;'
+    )
+    return cursor.fetchall()
+
+
+def get_monthly_stats():
+    cursor.execute(
+        f'SELECT SUM(amount) as summary, subcategorie, categorie '
+        f'FROM expenses '
+        f'WHERE DATE(time, "start of month")=DATE("now", "start of month") '
+        f'GROUP BY subcategorie '
+        f'ORDER BY summary DESC '
+        f'LIMIT 10'
+    )
+    return cursor.fetchall()
+
+
+def get_top_ten_stats():
+    cursor.execute(
+        f'SELECT SUM(amount) as summary, subcategorie, categorie '
+        f'FROM expenses '
+        f'GROUP BY subcategorie '
+        f'ORDER BY summary DESC '
+        f'LIMIT 10;'
+    )
+    return cursor.fetchall()
+
+
 def _init_db():
     """Инициализирует БД"""
     with open("db/createdb.sql", "r") as f:
@@ -73,3 +121,6 @@ def check_db_exists():
 
 
 check_db_exists()
+
+
+print(get_weekly_stats())
