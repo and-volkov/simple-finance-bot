@@ -10,12 +10,15 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 from aiogram.dispatcher import FSMContext
 
+import db_queries
+import expenses
 from middelwares import AccessMiddleware
 
 from income import add_income
 from expenses import add_expense
 from keyboards import (MainMenu, ExpensesCategories,
-                       IncomeCategories, expenses_keyboards_dict)
+                       IncomeCategories, expenses_keyboards_dict,
+                       TextStats, TextGraph)
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
 ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
@@ -198,7 +201,7 @@ async def process_expense_amount(message: types.Message, state: FSMContext):
             message.chat.id,
             md.text(
                 md.text('Category: ', md.bold(data['categorie'])),
-                md.text('Subcategory', md.bold(data['subcategorie'])),
+                md.text('Subcategorie', md.bold(data['subcategorie'])),
                 md.text('Amount: ', md.bold(data['amount'])),
                 sep='\n'
             ),
@@ -215,6 +218,35 @@ async def process_expense_amount(message: types.Message, state: FSMContext):
         'Add more, or write "cancel"',
         reply_markup=MainMenu().create_keyboard()
     )
+
+
+@dp.message_handler(commands='Stats')
+async def stats_menu(message: types.Message):
+    """Open stats menu"""
+    keyboard = TextGraph().create_keyboard()
+    await message.reply('Choose stat type', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=['TextStats'])
+async def text_stats(message: types.Message):
+    """Choose text stats option"""
+    keyboard = TextStats().create_keyboard()
+    await message.reply('Choose stat option', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=['Today', 'Week', 'Month', 'AllTime'])
+async def show_stats(message: types.Message):
+    """Showing stat"""
+    command = message.text.split('/')[1]
+    query_result = db_queries.stats_dict[command]
+    amount, subcategorie, categorie = expenses.parse_stats_query(query_result)
+    for i in range(len(amount)):
+        await bot.send_message(
+            message.chat.id,
+            md.text(
+                f'{amount[i]} | {subcategorie[i]} | {categorie[i]}'
+            )
+        )
 
 
 if __name__ == '__main__':
