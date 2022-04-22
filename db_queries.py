@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import os
 
@@ -121,6 +121,3 @@ def check_db_exists():
 
 
 check_db_exists()
-
-
-print(get_weekly_stats())

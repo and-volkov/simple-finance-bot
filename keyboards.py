@@ -103,15 +103,6 @@ class TravelSubcategories(Keyboard):
         super().__init__(button_names)
 
 
-#  Income keyboards
-class IncomeCategories(Keyboard):
-    def __init__(self):
-        button_names = get_categories(
-            'income_categories',
-        )
-        super().__init__(button_names)
-
-
 expenses_keyboards_dict = {
     'Home': HomeSubcategories().create_keyboard(),
     'Groceries': GroceriesSubcategories().create_keyboard(),
@@ -120,3 +111,12 @@ expenses_keyboards_dict = {
     'Clothes': ClothesSubcategories().create_keyboard(),
     'Travel': TravelSubcategories().create_keyboard()
 }
+
+
+#  Income keyboards
+class IncomeCategories(Keyboard):
+    def __init__(self):
+        button_names = get_categories(
+            'income_categories',
+        )
+        super().__init__(button_names)
