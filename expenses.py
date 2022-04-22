@@ -58,6 +58,3 @@ def parse_message(message: str):
 def parse_stats_query(query: List[Tuple[str]]) -> Tuple[Tuple]:
     amount, subcategorie, categorie = zip(*query)
     return amount, subcategorie, categorie
-
-
-print(parse_stats_query(db_queries.get_weekly_stats()))
