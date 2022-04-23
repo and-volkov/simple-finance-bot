@@ -236,6 +236,7 @@ async def text_stats(message: types.Message):
     await message.reply('Choose stat option', reply_markup=keyboard)
 
 
+# noinspection PyTupleAssignmentBalance
 @dp.message_handler(
     commands=['TextToday', 'TextWeek', 'TextMonth', 'TextAllTime']
 )
@@ -243,15 +244,20 @@ async def show_text_stats(message: types.Message):
     """Showing stat"""
     command = message.text.split('/')[1]
     stats_dict = StatsQueries().get_stats_dict()
-    query_result = stats_dict[command]
-    amount, subcategorie, categorie = expenses.parse_stats_query(query_result)
-    for i in range(len(amount)):
-        await bot.send_message(
-            message.chat.id,
-            md.text(
-                f'{amount[i]} | {subcategorie[i]} | {categorie[i]}'
-            )
+    try:
+        query_result = stats_dict[command]
+        amount, subcategorie, categorie = expenses.parse_stats_query(
+            query_result
         )
+        for i in range(len(amount)):
+            await bot.send_message(
+                message.chat.id,
+                md.text(
+                    f'{amount[i]} | {subcategorie[i]} | {categorie[i]}'
+                )
+            )
+    except ValueError:
+        await message.answer('No spending`s today')
 
 
 @dp.message_handler(commands=['GraphStats'])
