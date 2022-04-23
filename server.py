@@ -3,21 +3,20 @@ import logging
 from time import sleep
 from typing import AnyStr
 
-from aiogram import Bot, Dispatcher, executor, types
 import aiogram.utils.markdown as md
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher.filters import Text
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ParseMode
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from db_queries import StatsQueries
-import expenses
 from middelwares import AccessMiddleware
 
 from income import add_income
-from expenses import add_expense
 from tables import GraphStatistic
+from expenses import add_expense, parse_stats_query
 from keyboards import (MainMenu, ExpensesCategories,
                        IncomeCategories, expenses_keyboards_dict,
                        TextStats, TextGraph, GraphStats)
@@ -43,6 +42,13 @@ class ExpenseForm(StatesGroup):
     categorie = State()
     subcategorie = State()
     amount = State()
+
+
+@dp.message_handler(commands=['start', '/'])
+async def main_menu(message: types.Message):
+    """Open Main Menu"""
+    keyboard = MainMenu().create_keyboard()
+    await message.reply('Choose option', reply_markup=keyboard)
 
 
 @dp.message_handler(commands=['help'])
@@ -73,13 +79,6 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await state.finish()
     # And remove keyboard (just in case)
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
-
-
-@dp.message_handler(commands=['start', '/'])
-async def main_menu(message: types.Message):
-    """Open Main Menu"""
-    keyboard = MainMenu().create_keyboard()
-    await message.reply('Choose option', reply_markup=keyboard)
 
 
 #  Set state for Income Command
@@ -246,7 +245,7 @@ async def show_text_stats(message: types.Message):
     stats_dict = StatsQueries().get_stats_dict()
     try:
         query_result = stats_dict[command]
-        amount, subcategorie, categorie = expenses.parse_stats_query(
+        amount, subcategorie, categorie = parse_stats_query(
             query_result
         )
         for i in range(len(amount)):
@@ -274,6 +273,7 @@ async def send_graph_stat(message: types.Message):
     """Create and send plot of chosen type"""
     stat_type = message.text.split('/')[1]
     GraphStatistic().create_plot(query_name=stat_type)
+    # need some time to create plot
     await message.answer('Calculating...Wait please')
     sleep(5)
     with open('graphs/output.png', 'rb') as f:
