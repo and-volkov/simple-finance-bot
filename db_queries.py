@@ -120,10 +120,10 @@ def get_top_ten_stats(action: str):
 
 
 stats_dict = {
-    'Today': get_today_stats('handler'),
-    'Week': get_weekly_stats('handler'),
-    'Month': get_monthly_stats('handler'),
-    'AllTime': get_top_ten_stats('handler')
+    'TextToday': get_today_stats('handler'),
+    'TextWeek': get_weekly_stats('handler'),
+    'TextMonth': get_monthly_stats('handler'),
+    'TextAllTime': get_top_ten_stats('handler')
 }
 
 
