@@ -1,5 +1,6 @@
 import os
 import logging
+from time import sleep
 from typing import AnyStr
 
 from aiogram import Bot, Dispatcher, executor, types
@@ -16,9 +17,10 @@ from middelwares import AccessMiddleware
 
 from income import add_income
 from expenses import add_expense
+from tables import GraphStatistic
 from keyboards import (MainMenu, ExpensesCategories,
                        IncomeCategories, expenses_keyboards_dict,
-                       TextStats, TextGraph)
+                       TextStats, TextGraph, GraphStats)
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
 ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
@@ -73,7 +75,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start', '/'])
 async def main_menu(message: types.Message):
     """Open Main Menu"""
     keyboard = MainMenu().create_keyboard()
@@ -234,8 +236,10 @@ async def text_stats(message: types.Message):
     await message.reply('Choose stat option', reply_markup=keyboard)
 
 
-@dp.message_handler(commands=['Today', 'Week', 'Month', 'AllTime'])
-async def show_stats(message: types.Message):
+@dp.message_handler(
+    commands=['TextToday', 'TextWeek', 'TextMonth', 'TextAllTime']
+)
+async def show_text_stats(message: types.Message):
     """Showing stat"""
     command = message.text.split('/')[1]
     query_result = db_queries.stats_dict[command]
@@ -247,6 +251,27 @@ async def show_stats(message: types.Message):
                 f'{amount[i]} | {subcategorie[i]} | {categorie[i]}'
             )
         )
+
+
+@dp.message_handler(commands=['GraphStats'])
+async def graph_stats(message: types.Message):
+    """Choose graph stats option"""
+    keyboard = GraphStats().create_keyboard()
+    await message.reply('Choose stat option', reply_markup=keyboard)
+
+
+@dp.message_handler(
+    commands=['GraphToday', 'GraphWeek', 'GraphMonth', 'GraphAllTime']
+)
+async def send_graph_stat(message: types.Message):
+    """Create and send plot of chosen type"""
+    stat_type = message.text.split('/')[1]
+    GraphStatistic().create_plot(query_name=stat_type)
+    await message.answer('Calculating...Wait please')
+    sleep(5)
+    with open('graphs/output.png', 'rb') as f:
+        graph = f.read()
+    await bot.send_photo(chat_id=message.chat.id, photo=graph)
 
 
 if __name__ == '__main__':
