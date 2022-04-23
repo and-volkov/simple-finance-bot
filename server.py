@@ -11,7 +11,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 from aiogram.dispatcher import FSMContext
 
-import db_queries
+from db_queries import StatsQueries
 import expenses
 from middelwares import AccessMiddleware
 
@@ -140,7 +140,7 @@ async def process_income_amount(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply(
         'Add more, or write "cancel"',
-        MainMenu().create_keyboard()
+        reply_markup=MainMenu().create_keyboard()
     )
 
 
@@ -242,7 +242,8 @@ async def text_stats(message: types.Message):
 async def show_text_stats(message: types.Message):
     """Showing stat"""
     command = message.text.split('/')[1]
-    query_result = db_queries.stats_dict[command]
+    stats_dict = StatsQueries().get_stats_dict()
+    query_result = stats_dict[command]
     amount, subcategorie, categorie = expenses.parse_stats_query(query_result)
     for i in range(len(amount)):
         await bot.send_message(

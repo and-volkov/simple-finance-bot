@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-import db_queries
+from db_queries import StatsQueries
 
 
 class GraphStatistic:
@@ -13,10 +13,10 @@ class GraphStatistic:
         self.action = 'pandas'
         self.graph_folder = os.path.dirname('graphs/')
         self.queries_dict = {
-            'GraphToday': db_queries.get_today_stats(self.action),
-            'GraphWeek': db_queries.get_weekly_stats(self.action),
-            'GraphMonth': db_queries.get_monthly_stats(self.action),
-            'GraphAllTime': db_queries.get_top_ten_stats(self.action)
+            'GraphToday': StatsQueries().get_today_stats(self.action),
+            'GraphWeek': StatsQueries().get_weekly_stats(self.action),
+            'GraphMonth': StatsQueries().get_monthly_stats(self.action),
+            'GraphAllTime': StatsQueries().get_top_ten_stats(self.action)
         }
 
         self.connection = sqlite3.connect(os.path.join('db', 'finances.db'))

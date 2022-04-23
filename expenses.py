@@ -1,7 +1,7 @@
 import datetime
 from typing import NamedTuple, List, Tuple
 
-import db_queries
+from db_queries import IncomeExpensesQueries
 
 
 class Expense(NamedTuple):
@@ -26,8 +26,8 @@ def add_expense(
     amount: str,
 ) -> Expense:
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    description = db_queries.get_expenses_description(subcategory)
-    db_queries.insert(
+    description = IncomeExpensesQueries().get_expenses_description(subcategory)
+    IncomeExpensesQueries().insert(
         'expenses', {
             'categorie': category,
             'subcategorie': subcategory,

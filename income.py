@@ -1,7 +1,7 @@
 import datetime
 from typing import NamedTuple
 
-import db_queries
+from db_queries import IncomeExpensesQueries
 
 
 class Income(NamedTuple):
@@ -22,15 +22,15 @@ class Income(NamedTuple):
 
 def add_income(amount: int, categorie: str):
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    description = db_queries.get_income_description(categorie)
-    db_queries.insert(
+    description = IncomeExpensesQueries().get_income_description(categorie)
+    IncomeExpensesQueries().insert(
         'income', {
             'amount': amount,
             'time': time,
             'categorie': categorie,
             'description': description
-            }
-        )
+        }
+    )
     return Income(
         id=None,
         amount=int(amount),
