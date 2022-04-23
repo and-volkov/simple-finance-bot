@@ -127,7 +127,7 @@ class TextGraph(Keyboard):
     def __init__(self):
         button_names = [
             'TextStats',
-            'GraphicStats'
+            'GraphStats'
         ]
         super().__init__(button_names)
 
@@ -135,9 +135,20 @@ class TextGraph(Keyboard):
 class TextStats(Keyboard):
     def __init__(self):
         button_names = [
-            'Today',
-            'Week',
-            'Month',
-            'AllTime'
+            'TextToday',
+            'TextWeek',
+            'TextMonth',
+            'TextAllTime'
+        ]
+        super().__init__(button_names)
+
+
+class GraphStats(Keyboard):
+    def __init__(self):
+        button_names = [
+            'GraphToday',
+            'GraphWeek',
+            'GraphMonth',
+            'GraphAllTime'
         ]
         super().__init__(button_names)
