@@ -29,7 +29,7 @@ class GraphStatistic:
 
         fig = plt.figure(figsize=(8, 4))
         plt.grid(True)
-        plt.title('expenses')
+        plt.title(query_name)
         plt.barh(
             df['subcategorie'], df['summary'],
             height=0.7,
