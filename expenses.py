@@ -1,5 +1,5 @@
 import datetime
-from typing import NamedTuple, List, Tuple
+from typing import NamedTuple, List, Tuple, Any
 
 from db_queries import IncomeExpensesQueries
 
@@ -55,6 +55,6 @@ def parse_message(message: str):
     return [val.strip() for val in message_list]
 
 
-def parse_stats_query(query: List[Tuple[str]]) -> Tuple[Tuple]:
+def parse_stats_query(query: List[Tuple[str]]) -> Tuple[Any, Any, Any]:
     amount, subcategorie, categorie = zip(*query)
     return amount, subcategorie, categorie

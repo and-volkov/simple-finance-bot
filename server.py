@@ -235,7 +235,6 @@ async def text_stats(message: types.Message):
     await message.reply('Choose stat option', reply_markup=keyboard)
 
 
-# noinspection PyTupleAssignmentBalance
 @dp.message_handler(
     commands=['TextToday', 'TextWeek', 'TextMonth', 'TextAllTime']
 )
