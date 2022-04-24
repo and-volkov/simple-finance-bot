@@ -34,8 +34,8 @@ class MainMenu(Keyboard):
             'Income',
             'Help',
             'Stats',
-            'Delete Expense',
-            'Delete Income',
+            'DeleteExpenses',
+            'DeleteIncome',
             ]
         super().__init__(button_names)
 
@@ -150,5 +150,16 @@ class GraphStats(Keyboard):
             'GraphWeek',
             'GraphMonth',
             'GraphAllTime'
+        ]
+        super().__init__(button_names)
+
+
+class DeleteChoices(Keyboard):
+    def __init__(self):
+        button_names = [
+            'DeleteLast',
+            'DeleteLastFive',
+            'DeleteCurrentMonth',
+            'ShowLastFive'
         ]
         super().__init__(button_names)

@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 from time import sleep
 from typing import AnyStr
@@ -17,9 +18,10 @@ from middelwares import AccessMiddleware
 from income import add_income
 from tables import GraphStatistic
 from expenses import add_expense, parse_stats_query
+from db_queries import DeleteQueries
 from keyboards import (MainMenu, ExpensesCategories,
                        IncomeCategories, expenses_keyboards_dict,
-                       TextStats, TextGraph, GraphStats)
+                       TextStats, TextGraph, GraphStats, DeleteChoices)
 
 BOT_API_TOKEN: AnyStr = os.getenv('BOT_API_TOKEN')
 ACCESS_ID: AnyStr = os.getenv('MY_TELEGRAM_ID')
@@ -33,6 +35,9 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(AccessMiddleware(ACCESS_ID))
 
 
+MAIN_MENU = MainMenu().create_keyboard()
+
+
 class IncomeForm(StatesGroup):
     categorie = State()
     amount = State()
@@ -44,23 +49,26 @@ class ExpenseForm(StatesGroup):
     amount = State()
 
 
-@dp.message_handler(commands=['start', '/'])
+class DeleteForm(StatesGroup):
+    table_name = State()
+    operation = State()
+
+
+@dp.message_handler(commands=['start'])
 async def main_menu(message: types.Message):
     """Open Main Menu"""
-    keyboard = MainMenu().create_keyboard()
-    await message.reply('Choose option', reply_markup=keyboard)
+    await message.reply('Choose option', reply_markup=MAIN_MENU)
 
 
 @dp.message_handler(commands=['help'])
 async def help_message(message: types.Message):
     """Show Help message"""
-    keyboard = MainMenu().create_keyboard()
     await message.reply(
         'Bot for finance monitoring\n\n'
         'You can add expenses by categories\n'
         'Add income, delete expense/income\n'
         'Look at your stats for day, week, month, all time',
-        reply_markup=keyboard
+        reply_markup=MAIN_MENU
     )
 
 
@@ -78,7 +86,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     # Cancel state and inform user about it
     await state.finish()
     # And remove keyboard (just in case)
-    await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
+    await message.reply('Cancelled.', reply_markup=MAIN_MENU)
 
 
 #  Set state for Income Command
@@ -139,7 +147,7 @@ async def process_income_amount(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply(
         'Add more, or write "cancel"',
-        reply_markup=MainMenu().create_keyboard()
+        reply_markup=MAIN_MENU
     )
 
 
@@ -217,7 +225,7 @@ async def process_expense_amount(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply(
         'Add more, or write "cancel"',
-        reply_markup=MainMenu().create_keyboard()
+        reply_markup=MAIN_MENU
     )
 
 
@@ -256,6 +264,7 @@ async def show_text_stats(message: types.Message):
             )
     except ValueError:
         await message.answer('No spending`s today')
+    await message.reply(text='Continue', reply_markup=MAIN_MENU)
 
 
 @dp.message_handler(commands=['GraphStats'])
@@ -277,7 +286,32 @@ async def send_graph_stat(message: types.Message):
     sleep(5)
     with open('graphs/output.png', 'rb') as f:
         graph = f.read()
+    await message.reply('Continue', reply_markup=MAIN_MENU)
     await bot.send_photo(chat_id=message.chat.id, photo=graph)
+
+
+@dp.message_handler(commands=['DeleteExpenses', 'DeleteIncome'])
+async def set_delete_state(message: types.Message, state: FSMContext):
+    text = message.text.split('/')[1]
+    table_name = re.findall('[A-Z][^A-Z]*', text)[1].lower()
+    await DeleteForm.table_name.set()
+    async with state.proxy() as data:
+        data['table_name'] = table_name
+    await DeleteForm.next()
+    keyboard = DeleteChoices().create_keyboard()
+    await message.reply('Choose', reply_markup=keyboard)
+
+
+@dp.message_handler(state=DeleteForm.operation)
+async def process_delete_operation(message: types.Message, state: FSMContext):
+    operation = message.text.split('/')[1]
+    async with state.proxy() as data:
+        data['operation'] = operation
+        delete_func_dict = DeleteQueries(data['table_name']).delete_choices_dict()
+        result = delete_func_dict[data['operation']]()
+
+    await state.finish()
+    await message.reply(result, reply_markup=MAIN_MENU)
 
 
 if __name__ == '__main__':

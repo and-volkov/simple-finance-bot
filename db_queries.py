@@ -131,6 +131,60 @@ class StatsQueries(Query):
         return stats_dict
 
 
+class DeleteQueries(Query):
+    def __init__(self, table_name):
+        self.table_name = table_name
+        super().__init__()
+
+    def show_last_five_transactions(self):
+        query = (
+            f'SELECT subcategorie, categorie, amount '
+            f'FROM {self.table_name} '
+            f'ORDER BY time DESC '
+            f'LIMIT 5;'
+        )
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def delete_last_transaction(self) -> str:
+        query = (
+            f'DELETE FROM {self.table_name} '
+            f'WHERE id=(SELECT MAX(id) FROM {self.table_name})'
+        )
+        self.cursor.execute(query)
+        self.connection.commit()
+        return f'Last transaction from {self.table_name} deleted'
+
+    def delete_last_five_transactions(self) -> str:
+        query = (
+            f'DELETE FROM {self.table_name} '
+            f'WHERE id IN '
+            f'(SELECT id FROM {self.table_name} ORDER BY time DESC LIMIT 5);'
+        )
+        self.cursor.execute(query)
+        self.connection.commit()
+        return f'Last five transactions from {self.table_name} deleted'
+
+    def delete_current_month_transactions(self) -> str:
+        query = (
+            f'DELETE FROM {self.table_name} '
+            f'WHERE DATE(time, "start of month")='
+            f'DATE("now", "start of month") '
+        )
+        self.cursor.execute(query)
+        self.connection.commit()
+        return f'Deleted transactions from {self.table_name} for current month'
+
+    def delete_choices_dict(self):
+        choices_dict = {
+            'DeleteLast': self.delete_last_transaction,
+            'DeleteLastFive': self.delete_last_five_transactions,
+            'DeleteCurrentMonth': self.delete_current_month_transactions,
+            'ShowLastFive': self.show_last_five_transactions
+            }
+        return choices_dict
+
+
 class InitDB(Query):
     def __init__(self):
         super().__init__()
