@@ -82,7 +82,7 @@ INSERT INTO expenses_subcategories(subcategorie, categorie, description)
     ("Pants", "Clothes", "Штаны"),
     ("Underwear", "Clothes", "Нижнее Белье"),
     ("Outerwear", "Clothes", "Верхняя Одежда"),
-    ("Shirts/hoodies", "Clothes", "Рубашки, Балахоны"),
+    ("Shirts-hoodies", "Clothes", "Рубашки, Балахоны"),
     ("Sportswear", "Clothes", "Спортивная одежда"),
     ("Other-Clothes", "Clothes", "Другое"),
     /* Insert for Travel category */
