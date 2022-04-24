@@ -307,7 +307,9 @@ async def process_delete_operation(message: types.Message, state: FSMContext):
     operation = message.text.split('/')[1]
     async with state.proxy() as data:
         data['operation'] = operation
-        delete_func_dict = DeleteQueries(data['table_name']).delete_choices_dict()
+        delete_func_dict = DeleteQueries(
+            data['table_name']
+        ).delete_choices_dict()
         result = delete_func_dict[data['operation']]()
 
     await state.finish()
