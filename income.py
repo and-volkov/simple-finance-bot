@@ -7,7 +7,7 @@ from db_queries import IncomeExpensesQueries
 class Income(NamedTuple):
     id: int
     amount: int
-    time: datetime.datetime
+    time: str
     categorie: str
     description: str
 

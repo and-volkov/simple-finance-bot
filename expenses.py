@@ -8,7 +8,7 @@ class Expense(NamedTuple):
     id: int
     category: str
     subcategory: str
-    time: datetime.datetime
+    time: str
     amount: int
     description: str
 
@@ -41,18 +41,9 @@ def add_expense(
         category=category,
         subcategory=subcategory,
         time=time,
-        amount=amount,
+        amount=int(amount),
         description=description
     )
-
-
-def split_message(message: str):
-    return message.split(',').strip()
-
-
-def parse_message(message: str):
-    message_list = message.split(',')
-    return [val.strip() for val in message_list]
 
 
 def parse_stats_query(query: List[Tuple[str]]) -> Tuple[Any, Any, Any]:
