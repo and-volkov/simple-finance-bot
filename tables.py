@@ -11,6 +11,8 @@ from db_queries import StatsQueries
 class GraphStatistic:
     def __init__(self):
         self.action = 'pandas'
+        if not os.path.exists('graphs'):
+            os.makedirs('graphs')
         self.graph_folder = os.path.dirname('graphs/')
         self.queries_dict = {
             'GraphToday': StatsQueries().get_today_stats(self.action),
