@@ -316,5 +316,20 @@ async def process_delete_operation(message: types.Message, state: FSMContext):
     await message.reply(result, reply_markup=MAIN_MENU)
 
 
+@dp.errors_handler()
+async def handle_all_errors(update, error):
+    chat_id = update.message.chat.id
+    await bot.send_message(
+        chat_id,
+        (
+            f'Bot received wrong command.\n'
+            f'Raised error:\n'
+            f'>>> {error} <<<\n'
+            f'User should write "cancel" command to reset bot'
+        ),
+    )
+    return True
+
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True, timeout=1, relax=0.1)
