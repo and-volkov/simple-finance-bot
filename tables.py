@@ -4,6 +4,7 @@ import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import datetime as dt
 
 from db_queries import StatsQueries
 
@@ -24,6 +25,7 @@ class GraphStatistic:
         self.connection = sqlite3.connect(os.path.join('db', 'finances.db'))
 
     def create_plot(self, query_name):
+        time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         df = pd.read_sql(
             self.queries_dict[query_name],
             self.connection
@@ -31,7 +33,7 @@ class GraphStatistic:
 
         fig = plt.figure(figsize=(8, 4))
         plt.grid(True)
-        plt.title(query_name)
+        plt.title(f'{query_name} - {time}')
         plt.barh(
             df['subcategorie'], df['summary'],
             height=0.7,
