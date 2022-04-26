@@ -181,7 +181,7 @@ class DeleteQueries(Query):
             'DeleteLastFive': self.delete_last_five_transactions,
             'DeleteCurrentMonth': self.delete_current_month_transactions,
             'ShowLastFive': self.show_last_five_transactions
-            }
+        }
         return choices_dict
 
 
