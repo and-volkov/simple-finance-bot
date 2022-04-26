@@ -39,5 +39,5 @@
 
 ``` 
 docker build -t tgfinances ./
-docker run --name tg-finance-bot -v /Users/andrewvolkov/Dev/simple-finance-bot/db/:/home/db tgfinances   
+docker run --name tg-finance-bot -v *YOUR LOCAL PATH*/db/:/home/db tgfinances   
 ```
