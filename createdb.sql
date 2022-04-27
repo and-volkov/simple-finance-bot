@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS transactions;
 CREATE TABLE expenses(
 	id INTEGER primary key,
 	categorie VARCHAR(255) REFERENCES categories(categorie),
@@ -13,7 +12,6 @@ CREATE TABLE expenses_categories(
 	description VARCHAR(255)
 	);
 
-DROP TABLE IF EXISTS expenses_subcategories;
 CREATE TABLE expenses_subcategories(
     subcategorie VARCHAR(255) PRIMARY KEY,
     categorie VARCHAR(255) REFERENCES categories(categorie),
@@ -21,7 +19,6 @@ CREATE TABLE expenses_subcategories(
     commentary TEXT
 );
 
-DROP TABLE IF EXISTS income;
 CREATE TABLE income(
 	id INTEGER PRIMARY KEY,
 	amount INTEGER,
@@ -30,7 +27,6 @@ CREATE TABLE income(
 	description VARCHAR(255)
 	);
 
-DROP TABLE IF EXISTS income_categories;
 CREATE TABLE income_categories(
     id INTEGER PRIMARY KEY,
     categorie VARCHAR(255) REFERENCES  income(categorie),
